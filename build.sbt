@@ -48,6 +48,7 @@ lazy val jwtCirce = Projects
 
 lazy val csrfCore = Projects
   .createModule("csrf-core", "csrf/core")
+  .settings(publish / skip := true)
 
 lazy val modules: Seq[ProjectReference] = Seq(
   jwtCore,
