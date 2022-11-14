@@ -7,6 +7,7 @@ ThisBuild / organizationHomepage := Some(url("https://github.com/andrewrigas/oat
 ThisBuild / scalafixDependencies += "com.github.liancheng" %% "organize-imports" % "0.6.0"
 ThisBuild / coverageEnabled := true
 ThisBuild / tlBaseVersion := "0.0"
+ThisBuild / tlMimaPreviousVersions := Set.empty
 ThisBuild / licenses := Seq(License.Apache2)
 ThisBuild / developers := List(
   tlGitHubDev("andrewrigas", "Andreas Rigas")
