@@ -1,37 +1,19 @@
 package io.oath.jwt
 
-import java.time.Instant
-
-import com.auth0.jwt.interfaces.DecodedJWT
-import eu.timepit.refined.types.string.NonEmptyString
-
-import scala.jdk.CollectionConverters.CollectionHasAsScala
+import io.oath.jwt.model.{JwtClaims, RegisteredClaims}
 
 package object syntax {
 
-  private[oath] implicit class DecodedJWTOps(private val decodedJWT: DecodedJWT) {
-    def getOptionNonEmptyStringIssuer: Option[NonEmptyString] =
-      Option(decodedJWT.getIssuer)
-        .flatMap(NonEmptyString.unapply)
+  implicit class RegisteredClaimsOps(value: RegisteredClaims) {
+    def toClaims: JwtClaims.Claims = JwtClaims.Claims(value)
+  }
 
-    def getOptionNonEmptyStringSubject: Option[NonEmptyString] =
-      Option(decodedJWT.getSubject)
-        .flatMap(NonEmptyString.unapply)
+  implicit class SingleValueClaimsOps[A](value: A) {
+    def toClaimsP: JwtClaims.ClaimsP[A] = JwtClaims.ClaimsP(value)
+    def toClaimsH: JwtClaims.ClaimsH[A] = JwtClaims.ClaimsH(value)
+  }
 
-    def getOptionNonEmptyStringID: Option[NonEmptyString] =
-      Option(decodedJWT.getId)
-        .flatMap(NonEmptyString.unapply)
-
-    def getSeqNonEmptyStringAudience: Seq[NonEmptyString] =
-      Option(decodedJWT.getAudience).map(_.asScala).toSeq.flatMap(_.flatMap(NonEmptyString.unapply))
-
-    def getOptionExpiresAt: Option[Instant] =
-      Option(decodedJWT.getExpiresAt).map(_.toInstant)
-
-    def getOptionIssueAt: Option[Instant] =
-      Option(decodedJWT.getIssuedAt).map(_.toInstant)
-
-    def getOptionNotBefore: Option[Instant] =
-      Option(decodedJWT.getNotBefore).map(_.toInstant)
+  implicit class TupleValueClaimsOps[A, B](value: (A, B)) {
+    def toClaimsHP: JwtClaims.ClaimsHP[A, B] = JwtClaims.ClaimsHP(value._1, value._2)
   }
 }

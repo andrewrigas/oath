@@ -2,12 +2,12 @@ package io.oath.jwt.config
 
 import com.typesafe.config.{ConfigException, ConfigFactory}
 import eu.timepit.refined.types.string.NonEmptyString
-import io.oath.jwt.testkit.{AnyWordSpecBase, PropertyBasedTesting}
+import io.oath.jwt.testkit.AnyWordSpecBase
 
 import cats.implicits.catsSyntaxOptionId
 import scala.concurrent.duration.DurationInt
 
-class IssuerLoaderSpec extends AnyWordSpecBase with PropertyBasedTesting {
+class IssuerLoaderSpec extends AnyWordSpecBase {
 
   val configFile                            = "issuer"
   val DefaultTokenConfigLocation            = "default-token"

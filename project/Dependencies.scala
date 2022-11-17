@@ -9,7 +9,7 @@ object Dependencies {
     val scalacheck         = "1.17.0"
     val javaJWT            = "4.2.1"
     val config             = "1.4.2"
-    val cats               = "2.8.0"
+    val cats               = "2.9.0"
     val bcprov             = "1.70"
     val logbackClassic     = "1.4.4"
     val scalaLogging       = "3.9.5"
@@ -61,4 +61,7 @@ object Dependencies {
 
   lazy val jwtCirce =
     libraryDependencies ++= Circe.all
+
+  lazy val csrfCore =
+    libraryDependencies ++= Refined.all ++ Utils.all ++ Testing.all
 }

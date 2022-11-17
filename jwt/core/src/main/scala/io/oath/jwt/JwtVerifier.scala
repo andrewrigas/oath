@@ -9,7 +9,7 @@ import io.oath.jwt.model.{JwtClaims, JwtToken, JwtVerifyError, RegisteredClaims}
 
 import scala.util.control.Exception.allCatch
 
-import io.oath.jwt.syntax.DecodedJWTOps
+import io.oath.jwt.utils.DecodedJWTOps
 import scala.util.chaining.scalaUtilChainingOps
 
 final class JwtVerifier(config: VerifierConfig, customJWTVerifier: Option[JWTVerifier] = None) {
