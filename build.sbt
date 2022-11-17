@@ -53,7 +53,6 @@ lazy val httpCore = Projects
 
 lazy val csrfCore = Projects
   .createModule("csrf-core", "csrf/core")
-  .enablePlugins(NoPublishPlugin)
   .settings(Dependencies.csrfCore)
 
 lazy val modules: Seq[ProjectReference] = Seq(
