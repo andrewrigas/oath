@@ -10,7 +10,7 @@ object Dependencies {
     val javaJWT            = "4.2.1"
     val config             = "1.4.2"
     val cats               = "2.9.0"
-    val bcprov             = "1.70"
+    val bcprov             = "1.72"
     val logbackClassic     = "1.4.4"
     val scalaLogging       = "3.9.5"
     val refined            = "0.10.1"
@@ -43,7 +43,7 @@ object Dependencies {
   object Utils {
     val config         = "com.typesafe"                % "config"          % Versions.config
     val cats           = "org.typelevel"              %% "cats-core"       % Versions.cats
-    val bcprov         = "org.bouncycastle"            % "bcprov-jdk15on"  % Versions.bcprov
+    val bcprov         = "org.bouncycastle"            % "bcprov-jdk18on"  % Versions.bcprov
     val logbackClassic = "ch.qos.logback"              % "logback-classic" % Versions.logbackClassic % "provided"
     val scalaLogging   = "com.typesafe.scala-logging" %% "scala-logging"   % Versions.scalaLogging
 
