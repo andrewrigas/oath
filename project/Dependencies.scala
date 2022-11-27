@@ -11,10 +11,12 @@ object Dependencies {
     val config             = "1.4.2"
     val cats               = "2.9.0"
     val bcprov             = "1.72"
-    val logbackClassic     = "1.4.4"
+    val jackson            = "2.14.1"
+    val logbackClassic     = "1.4.5"
     val scalaLogging       = "3.9.5"
     val refined            = "0.10.1"
     val circe              = "0.14.3"
+    val jsoniterScala      = "2.18.0"
   }
 
   object Testing {
@@ -33,6 +35,14 @@ object Dependencies {
     val all = Seq(core, generic, parser)
   }
 
+  object JsoniterScala {
+    val core = "com.github.plokhotnyuk.jsoniter-scala" %% "jsoniter-scala-core" % Versions.jsoniterScala
+    val macros =
+      "com.github.plokhotnyuk.jsoniter-scala" %% "jsoniter-scala-macros" % Versions.jsoniterScala % "provided"
+
+    val all = Seq(core, macros)
+  }
+
   object Refined {
     val core       = "eu.timepit" %% "refined"            % Versions.refined
     val scalacheck = "eu.timepit" %% "refined-scalacheck" % Versions.refined % Test
@@ -41,13 +51,13 @@ object Dependencies {
   }
 
   object Utils {
-    val config         = "com.typesafe"                % "config"          % Versions.config
-    val cats           = "org.typelevel"              %% "cats-core"       % Versions.cats
-    val bcprov         = "org.bouncycastle"            % "bcprov-jdk18on"  % Versions.bcprov
-    val logbackClassic = "ch.qos.logback"              % "logback-classic" % Versions.logbackClassic % "provided"
-    val scalaLogging   = "com.typesafe.scala-logging" %% "scala-logging"   % Versions.scalaLogging
+    val config  = "com.typesafe"               % "config"           % Versions.config
+    val cats    = "org.typelevel"             %% "cats-core"        % Versions.cats
+    val bcprov  = "org.bouncycastle"           % "bcprov-jdk18on"   % Versions.bcprov
+    val jackson = "com.fasterxml.jackson.core" % "jackson-databind" % Versions.jackson
 
-    val all = Seq(config, cats, bcprov, logbackClassic, scalaLogging)
+    val jwt  = Seq(config, cats, bcprov, jackson)
+    val csrf = Seq(config, cats)
   }
 
   object Auth0 {
@@ -57,11 +67,14 @@ object Dependencies {
   }
 
   lazy val jwtCore =
-    libraryDependencies ++= Testing.all ++ Refined.all ++ Auth0.all ++ Utils.all ++ Circe.all.map(_ % Test)
+    libraryDependencies ++= Testing.all ++ Refined.all ++ Auth0.all ++ Utils.jwt ++ Circe.all.map(_ % Test)
 
   lazy val jwtCirce =
     libraryDependencies ++= Circe.all
 
+  lazy val jwtJsoniterScala =
+    libraryDependencies ++= JsoniterScala.all
+
   lazy val csrfCore =
-    libraryDependencies ++= Refined.all ++ Utils.all ++ Testing.all
+    libraryDependencies ++= Refined.all ++ Utils.csrf ++ Testing.all
 }

@@ -4,7 +4,7 @@ import io.circe.{parser, Decoder}
 import io.oath.jwt.ClaimsDecoder
 import io.oath.jwt.model.JwtVerifyError
 
-trait CirceDecoderConversion {
+trait CirceClaimsDecoderConversion {
 
   implicit def circeDecoderConversion[A](implicit decoder: Decoder[A]): ClaimsDecoder[A] = json =>
     parser

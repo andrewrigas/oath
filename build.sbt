@@ -46,6 +46,11 @@ lazy val jwtCirce = Projects
   .settings(Dependencies.jwtCirce)
   .dependsOn(jwtCore % "compile->compile;test->test")
 
+lazy val jwtJsoniterScala = Projects
+  .createModule("jwt-jsoniter-scala", "jwt/jsoniter-scala")
+  .settings(Dependencies.jwtJsoniterScala)
+  .dependsOn(jwtCore % "compile->compile;test->test")
+
 lazy val httpCore = Projects
   .createModule("http-core", "http/core")
   .enablePlugins(NoPublishPlugin)
@@ -58,5 +63,6 @@ lazy val csrfCore = Projects
 lazy val modules: Seq[ProjectReference] = Seq(
   jwtCore,
   jwtCirce,
+  jwtJsoniterScala,
   csrfCore
 )

@@ -9,7 +9,7 @@ import io.oath.jwt.config.IssuerConfig
 import io.oath.jwt.model.{IssueJwtError, RegisteredClaims}
 import io.oath.jwt.syntax._
 import io.oath.jwt.testkit.{AnyWordSpecBase, PropertyBasedTesting}
-import io.oath.jwt.utils.ClockHelper
+import io.oath.jwt.utils._
 
 import scala.util.Try
 
@@ -118,7 +118,9 @@ class JwtIssuerSpec extends AnyWordSpecBase with PropertyBasedTesting with Clock
 
         val result = jwtVerifier
           .verify(jwt.token.value)
-          .pipe(_.getHeaderClaim(dataField).asString())
+          .pipe(_.getHeader)
+          .pipe(base64DecodeToken)
+          .pipe(_.value)
           .pipe(nestedHeaderDecoder.decode)
           .value
 
@@ -131,7 +133,9 @@ class JwtIssuerSpec extends AnyWordSpecBase with PropertyBasedTesting with Clock
 
         val result = jwtVerifier
           .verify(jwt.token.value)
-          .pipe(_.getClaim(dataField).asString())
+          .pipe(_.getPayload)
+          .pipe(base64DecodeToken)
+          .pipe(_.value)
           .pipe(nestedPayloadDecoder.decode)
           .value
 
@@ -146,7 +150,7 @@ class JwtIssuerSpec extends AnyWordSpecBase with PropertyBasedTesting with Clock
           val (headerResult, payloadResult) = jwtVerifier
             .verify(jwt.token.value)
             .pipe(decodedJwt =>
-              decodedJwt.getHeaderClaim(dataField).asString() -> decodedJwt.getClaim(dataField).asString())
+              base64DecodeToken(decodedJwt.getHeader).value -> base64DecodeToken(decodedJwt.getPayload).value)
             .pipe { case (headerJson, payloadJson) =>
               (nestedHeaderDecoder.decode(headerJson).value, nestedPayloadDecoder.decode(payloadJson).value)
             }

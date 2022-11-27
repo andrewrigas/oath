@@ -6,10 +6,10 @@ import com.auth0.jwt.interfaces.DecodedJWT
 import com.auth0.jwt.{JWT, JWTVerifier}
 import io.oath.jwt.config.VerifierConfig
 import io.oath.jwt.model.{JwtClaims, JwtToken, JwtVerifyError, RegisteredClaims}
+import io.oath.jwt.utils._
 
 import scala.util.control.Exception.allCatch
 
-import io.oath.jwt.utils.DecodedJWTOps
 import scala.util.chaining.scalaUtilChainingOps
 
 final class JwtVerifier(config: VerifierConfig, customJWTVerifier: Option[JWTVerifier] = None) {
@@ -82,7 +82,8 @@ final class JwtVerifier(config: VerifierConfig, customJWTVerifier: Option[JWTVer
   ): Either[JwtVerifyError, JwtClaims.ClaimsH[H]] =
     for {
       decodedJwt <- verify(jwt)
-      payload    <- safeDecode(claimsDecoder.decode(decodedJwt.getHeaderClaim(dataField).asString()))
+      json       <- base64DecodeToken(decodedJwt.getHeader)
+      payload    <- safeDecode(claimsDecoder.decode(json))
       registeredClaims = getRegisteredClaims(decodedJwt)
     } yield JwtClaims.ClaimsH(payload, registeredClaims)
 
@@ -91,7 +92,8 @@ final class JwtVerifier(config: VerifierConfig, customJWTVerifier: Option[JWTVer
   ): Either[JwtVerifyError, JwtClaims.ClaimsP[P]] =
     for {
       decodedJwt <- verify(jwt)
-      payload    <- safeDecode(claimsDecoder.decode(decodedJwt.getClaim(dataField).asString()))
+      json       <- base64DecodeToken(decodedJwt.getPayload)
+      payload    <- safeDecode(claimsDecoder.decode(json))
       registeredClaims = getRegisteredClaims(decodedJwt)
     } yield JwtClaims.ClaimsP(payload, registeredClaims)
 
@@ -100,18 +102,22 @@ final class JwtVerifier(config: VerifierConfig, customJWTVerifier: Option[JWTVer
       payloadDecoder: ClaimsDecoder[P]
   ): Either[JwtVerifyError, JwtClaims.ClaimsHP[H, P]] =
     verify(jwt).flatMap { decodedJwt =>
-      safeDecode(headerDecoder.decode(decodedJwt.getHeaderClaim(dataField).asString())) match {
-        case Right(header) =>
-          safeDecode(payloadDecoder.decode(decodedJwt.getClaim(dataField).asString())).left
-            .map(payloadDecodingError => JwtVerifyError.DecodingErrors(None, payloadDecodingError.some))
-            .map { payload =>
-              val registeredClaims = getRegisteredClaims(decodedJwt)
-              JwtClaims.ClaimsHP(header, payload, registeredClaims)
-            }
-        case Left(headerDecodingError) =>
-          safeDecode(payloadDecoder.decode(decodedJwt.getClaim(dataField).asString())).left.toOption
-            .pipe(JwtVerifyError.DecodingErrors(headerDecodingError.some, _))
-            .asLeft
-      }
+      for {
+        jsonHeader  <- base64DecodeToken(decodedJwt.getHeader)
+        jsonPayload <- base64DecodeToken(decodedJwt.getPayload)
+        jwtClaims <- safeDecode(headerDecoder.decode(jsonHeader)) match {
+          case Right(header) =>
+            safeDecode(payloadDecoder.decode(jsonPayload)).left
+              .map(payloadDecodingError => JwtVerifyError.DecodingErrors(None, payloadDecodingError.some))
+              .map { payload =>
+                val registeredClaims = getRegisteredClaims(decodedJwt)
+                JwtClaims.ClaimsHP(header, payload, registeredClaims)
+              }
+          case Left(headerDecodingError) =>
+            safeDecode(payloadDecoder.decode(jsonPayload)).left.toOption
+              .pipe(JwtVerifyError.DecodingErrors(headerDecodingError.some, _))
+              .asLeft
+        }
+      } yield jwtClaims
     }
 }
