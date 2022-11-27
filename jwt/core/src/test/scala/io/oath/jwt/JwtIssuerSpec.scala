@@ -6,9 +6,10 @@ import eu.timepit.refined.types.string.NonEmptyString
 import io.oath.jwt.NestedHeader._
 import io.oath.jwt.NestedPayload._
 import io.oath.jwt.config.IssuerConfig
-import io.oath.jwt.model.{IssueJwtError, JwtClaims, RegisteredClaims}
+import io.oath.jwt.model.{IssueJwtError, RegisteredClaims}
+import io.oath.jwt.syntax._
 import io.oath.jwt.testkit.{AnyWordSpecBase, PropertyBasedTesting}
-import io.oath.jwt.utils.ClockHelper
+import io.oath.jwt.utils._
 
 import scala.util.Try
 
@@ -61,7 +62,7 @@ class JwtIssuerSpec extends AnyWordSpecBase with PropertyBasedTesting with Clock
       "issue token with predefine configure claims and ad-hoc registered claims" in forAll {
         (registeredClaims: RegisteredClaims, config: IssuerConfig) =>
           val jwtIssuer = new JwtIssuer(config, clock)
-          val jwtClaims = jwtIssuer.issueJwt(JwtClaims.Claims(registeredClaims)).value
+          val jwtClaims = jwtIssuer.issueJwt(registeredClaims.toClaims).value
 
           val expectedIssuer  = registeredClaims.iss orElse config.registered.issuerClaim
           val expectedSubject = registeredClaims.sub orElse config.registered.subjectClaim
@@ -94,7 +95,7 @@ class JwtIssuerSpec extends AnyWordSpecBase with PropertyBasedTesting with Clock
           val adHocRegisteredClaims =
             registeredClaims.copy(iat = now.some, exp = now.plusSeconds(5.minutes.toSeconds).some, nbf = now.some)
           val jwtIssuer = new JwtIssuer(config, clock)
-          val jwtClaims = jwtIssuer.issueJwt(JwtClaims.Claims(adHocRegisteredClaims)).value
+          val jwtClaims = jwtIssuer.issueJwt(adHocRegisteredClaims.toClaims).value
 
           val decodedJWT = jwtVerifier.verify(jwtClaims.token.value)
 
@@ -113,11 +114,13 @@ class JwtIssuerSpec extends AnyWordSpecBase with PropertyBasedTesting with Clock
 
       "issue token with header claims" in forAll { (config: IssuerConfig, header: NestedHeader) =>
         val jwtIssuer = new JwtIssuer(config)
-        val jwt       = jwtIssuer.issueJwt(JwtClaims.ClaimsH(header)).value
+        val jwt       = jwtIssuer.issueJwt(header.toClaimsH).value
 
         val result = jwtVerifier
           .verify(jwt.token.value)
-          .pipe(_.getHeaderClaim(dataField).asString())
+          .pipe(_.getHeader)
+          .pipe(base64DecodeToken)
+          .pipe(_.value)
           .pipe(nestedHeaderDecoder.decode)
           .value
 
@@ -126,11 +129,13 @@ class JwtIssuerSpec extends AnyWordSpecBase with PropertyBasedTesting with Clock
 
       "issue token with payload claims" in forAll { (config: IssuerConfig, payload: NestedPayload) =>
         val jwtIssuer = new JwtIssuer(config)
-        val jwt       = jwtIssuer.issueJwt(JwtClaims.ClaimsP(payload)).value
+        val jwt       = jwtIssuer.issueJwt(payload.toClaimsP).value
 
         val result = jwtVerifier
           .verify(jwt.token.value)
-          .pipe(_.getClaim(dataField).asString())
+          .pipe(_.getPayload)
+          .pipe(base64DecodeToken)
+          .pipe(_.value)
           .pipe(nestedPayloadDecoder.decode)
           .value
 
@@ -140,12 +145,12 @@ class JwtIssuerSpec extends AnyWordSpecBase with PropertyBasedTesting with Clock
       "issue token with header & payload claims" in forAll {
         (config: IssuerConfig, header: NestedHeader, payload: NestedPayload) =>
           val jwtIssuer = new JwtIssuer(config)
-          val jwt       = jwtIssuer.issueJwt(JwtClaims.ClaimsHP(header, payload)).value
+          val jwt       = jwtIssuer.issueJwt((header, payload).toClaimsHP).value
 
           val (headerResult, payloadResult) = jwtVerifier
             .verify(jwt.token.value)
             .pipe(decodedJwt =>
-              decodedJwt.getHeaderClaim(dataField).asString() -> decodedJwt.getClaim(dataField).asString())
+              base64DecodeToken(decodedJwt.getHeader).value -> base64DecodeToken(decodedJwt.getPayload).value)
             .pipe { case (headerJson, payloadJson) =>
               (nestedHeaderDecoder.decode(headerJson).value, nestedPayloadDecoder.decode(payloadJson).value)
             }

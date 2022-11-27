@@ -7,13 +7,13 @@ import io.oath.jwt.NestedHeader._
 import io.oath.jwt.NestedPayload._
 import io.oath.jwt.config.VerifierConfig
 import io.oath.jwt.config.VerifierConfig.{LeewayWindowConfig, ProvidedWithConfig}
-import io.oath.jwt.model.{JwtClaims, JwtToken, JwtVerifyError, RegisteredClaims}
+import io.oath.jwt.model.{JwtToken, JwtVerifyError, RegisteredClaims}
+import io.oath.jwt.syntax._
 import io.oath.jwt.testkit.{AnyWordSpecBase, PropertyBasedTesting}
-import io.oath.jwt.utils.ClockHelper
+import io.oath.jwt.utils._
 
 import cats.implicits.catsSyntaxEitherId
 import cats.implicits.catsSyntaxOptionId
-import scala.jdk.CollectionConverters.MapHasAsJava
 import scala.util.chaining.scalaUtilChainingOps
 
 class JwtVerifierSpec extends AnyWordSpecBase with PropertyBasedTesting with ClockHelper {
@@ -58,48 +58,46 @@ class JwtVerifierSpec extends AnyWordSpecBase with PropertyBasedTesting with Clo
     "verify a token with header" in forAll { nestedHeader: NestedHeader =>
       val token = JWT
         .create()
-        .withHeader(
-          Map(dataField -> nestedHeaderEncoder.encode(nestedHeader)).asJava.asInstanceOf[java.util.Map[String, Object]])
+        .withHeader(unsafeParseJsonToJavaMap(nestedHeaderEncoder.encode(nestedHeader)))
         .sign(defaultConfig.algorithm)
 
       val jwtVerifier = new JwtVerifier(defaultConfig)
       val verified    = jwtVerifier.verifyJwt[NestedHeader](JwtToken.TokenH(NonEmptyString.unsafeFrom(token)))
 
-      verified.value shouldBe JwtClaims.ClaimsH(nestedHeader)
+      verified.value shouldBe nestedHeader.toClaimsH
     }
 
     "verify a token with payload" in forAll { nestedPayload: NestedPayload =>
       val token = JWT
         .create()
-        .withPayload(Map(dataField -> nestedPayloadEncoder.encode(nestedPayload)).asJava)
+        .withPayload(unsafeParseJsonToJavaMap(nestedPayloadEncoder.encode(nestedPayload)))
         .sign(defaultConfig.algorithm)
 
       val jwtVerifier = new JwtVerifier(defaultConfig)
       val verified    = jwtVerifier.verifyJwt[NestedPayload](JwtToken.TokenP(NonEmptyString.unsafeFrom(token)))
 
-      verified.value shouldBe JwtClaims.ClaimsP(nestedPayload)
+      verified.value shouldBe nestedPayload.toClaimsP
     }
 
     "verify a token with header & payload" in forAll { (nestedPayload: NestedPayload, nestedHeader: NestedHeader) =>
       val token = JWT
         .create()
-        .withPayload(Map(dataField -> nestedPayloadEncoder.encode(nestedPayload)).asJava)
-        .withHeader(
-          Map(dataField -> nestedHeaderEncoder.encode(nestedHeader)).asJava.asInstanceOf[java.util.Map[String, Object]])
+        .withPayload(unsafeParseJsonToJavaMap(nestedPayloadEncoder.encode(nestedPayload)))
+        .withHeader(unsafeParseJsonToJavaMap(nestedHeaderEncoder.encode(nestedHeader)))
         .sign(defaultConfig.algorithm)
 
       val jwtVerifier = new JwtVerifier(defaultConfig)
       val verified =
         jwtVerifier.verifyJwt[NestedHeader, NestedPayload](JwtToken.TokenHP(NonEmptyString.unsafeFrom(token)))
 
-      verified.value shouldBe JwtClaims.ClaimsHP(nestedHeader, nestedPayload)
+      verified.value shouldBe (nestedHeader, nestedPayload).toClaimsHP
     }
 
     "fail to decode a token with header" in {
       val header = """{"name": "name"}"""
       val token = JWT
         .create()
-        .withHeader(Map(dataField -> header).asJava.asInstanceOf[java.util.Map[String, Object]])
+        .withHeader(unsafeParseJsonToJavaMap(header))
         .sign(defaultConfig.algorithm)
 
       val jwtVerifier = new JwtVerifier(defaultConfig)
@@ -112,7 +110,7 @@ class JwtVerifierSpec extends AnyWordSpecBase with PropertyBasedTesting with Clo
       val payload = """{"name": "name"}"""
       val token = JWT
         .create()
-        .withPayload(Map(dataField -> payload).asJava)
+        .withPayload(unsafeParseJsonToJavaMap(payload))
         .sign(defaultConfig.algorithm)
 
       val jwtVerifier = new JwtVerifier(defaultConfig)
@@ -126,8 +124,8 @@ class JwtVerifierSpec extends AnyWordSpecBase with PropertyBasedTesting with Clo
       val payload = """{"name": "name"}"""
       val token = JWT
         .create()
-        .withHeader(Map(dataField -> header).asJava.asInstanceOf[java.util.Map[String, Object]])
-        .withPayload(Map(dataField -> payload).asJava)
+        .withHeader(unsafeParseJsonToJavaMap(header))
+        .withPayload(unsafeParseJsonToJavaMap(payload))
         .sign(defaultConfig.algorithm)
 
       val jwtVerifier = new JwtVerifier(defaultConfig)

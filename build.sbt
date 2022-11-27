@@ -15,6 +15,7 @@ ThisBuild / developers := List(
 ThisBuild / tlSonatypeUseLegacyHost := false
 ThisBuild / startYear := Some(2022)
 
+ThisBuild / githubWorkflowJavaVersions := Seq("11", "17").map(JavaSpec.temurin)
 ThisBuild / githubWorkflowAddedJobs ++= Seq(
   WorkflowJob(
     id = "checklint",
@@ -46,6 +47,11 @@ lazy val jwtCirce = Projects
   .settings(Dependencies.jwtCirce)
   .dependsOn(jwtCore % "compile->compile;test->test")
 
+lazy val jwtJsoniterScala = Projects
+  .createModule("jwt-jsoniter-scala", "jwt/jsoniter-scala")
+  .settings(Dependencies.jwtJsoniterScala)
+  .dependsOn(jwtCore % "compile->compile;test->test")
+
 lazy val httpCore = Projects
   .createModule("http-core", "http/core")
   .enablePlugins(NoPublishPlugin)
@@ -53,10 +59,11 @@ lazy val httpCore = Projects
 
 lazy val csrfCore = Projects
   .createModule("csrf-core", "csrf/core")
-  .enablePlugins(NoPublishPlugin)
+  .settings(Dependencies.csrfCore)
 
 lazy val modules: Seq[ProjectReference] = Seq(
   jwtCore,
   jwtCirce,
+  jwtJsoniterScala,
   csrfCore
 )

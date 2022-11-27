@@ -9,10 +9,10 @@ import com.auth0.jwt.{JWT, JWTCreator}
 import eu.timepit.refined.types.string.NonEmptyString
 import io.oath.jwt.config.IssuerConfig
 import io.oath.jwt.model.{IssueJwtError, Jwt, JwtClaims, RegisteredClaims}
+import io.oath.jwt.utils.unsafeParseJsonToJavaMap
 
 import scala.util.control.Exception.allCatch
 
-import scala.jdk.CollectionConverters.MapHasAsJava
 import scala.util.chaining.scalaUtilChainingOps
 
 final class JwtIssuer(config: IssuerConfig, clock: Clock = Clock.systemUTC()) {
@@ -79,8 +79,7 @@ final class JwtIssuer(config: IssuerConfig, clock: Clock = Clock.systemUTC()) {
         .tap(builder =>
           claimsEncoder
             .encode(claims.header)
-            .pipe(json =>
-              builder.withHeader(Map(dataField -> json).asJava.asInstanceOf[java.util.Map[String, Object]])))
+            .pipe(json => builder.withHeader(unsafeParseJsonToJavaMap(json))))
         .pipe(_ -> setRegisteredClaims(claims.registered))
         .pipe { case (builder, registeredClaims) =>
           setPredefinedClaims(builder, registeredClaims).sign(config.algorithm) -> registeredClaims
@@ -98,7 +97,7 @@ final class JwtIssuer(config: IssuerConfig, clock: Clock = Clock.systemUTC()) {
         .tap(builder =>
           claimsEncoder
             .encode(claims.payload)
-            .pipe(json => builder.withPayload(Map(dataField -> json).asJava)))
+            .pipe(json => builder.withPayload(unsafeParseJsonToJavaMap(json))))
         .pipe(_ -> setRegisteredClaims(claims.registered))
         .pipe { case (builder, registeredClaims) =>
           setPredefinedClaims(builder, registeredClaims).sign(config.algorithm) -> registeredClaims
@@ -117,12 +116,11 @@ final class JwtIssuer(config: IssuerConfig, clock: Clock = Clock.systemUTC()) {
         .tap(builder =>
           headerClaimsEncoder
             .encode(claims.header)
-            .pipe(json =>
-              builder.withHeader(Map(dataField -> json).asJava.asInstanceOf[java.util.Map[String, Object]])))
+            .pipe(json => builder.withHeader(unsafeParseJsonToJavaMap(json))))
         .tap(builder =>
           payloadClaimsEncoder
             .encode(claims.payload)
-            .pipe(json => builder.withPayload(Map(dataField -> json).asJava)))
+            .pipe(json => builder.withPayload(unsafeParseJsonToJavaMap(json))))
         .pipe(_ -> setRegisteredClaims(claims.registered))
         .pipe { case (builder, registeredClaims) =>
           setPredefinedClaims(builder, registeredClaims).sign(config.algorithm) -> registeredClaims

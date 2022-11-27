@@ -1,4 +1,4 @@
-package io.oath.jwt.testkit
+package io.oath.csrf.testkit
 
 import org.scalatest.matchers.should
 import org.scalatest.wordspec.AnyWordSpec
