@@ -15,6 +15,7 @@ ThisBuild / developers := List(
 ThisBuild / tlSonatypeUseLegacyHost := false
 ThisBuild / startYear := Some(2022)
 
+ThisBuild / githubWorkflowJavaVersions := Seq("11", "17").map(JavaSpec.temurin)
 ThisBuild / githubWorkflowAddedJobs ++= Seq(
   WorkflowJob(
     id = "checklint",
