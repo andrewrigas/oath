@@ -6,7 +6,7 @@ import io.oath.jwt.model.JwtVerifyError
 
 trait CirceClaimsDecoderConversion {
 
-  implicit def circeDecoderConversion[A](implicit decoder: Decoder[A]): ClaimsDecoder[A] = json =>
+  implicit def decoderConversion[A](implicit decoder: Decoder[A]): ClaimsDecoder[A] = json =>
     parser
       .parse(json)
       .left

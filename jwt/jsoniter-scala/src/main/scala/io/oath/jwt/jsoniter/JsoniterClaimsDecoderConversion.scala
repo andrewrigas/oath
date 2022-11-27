@@ -8,7 +8,7 @@ import scala.util.control.Exception.allCatch
 
 trait JsoniterClaimsDecoderConversion {
 
-  implicit def circeDecoderConversion[A](implicit codec: JsonValueCodec[A]): ClaimsDecoder[A] = json =>
+  implicit def decoderConversion[A](implicit codec: JsonValueCodec[A]): ClaimsDecoder[A] = json =>
     allCatch
       .withTry(readFromString(json))
       .toEither

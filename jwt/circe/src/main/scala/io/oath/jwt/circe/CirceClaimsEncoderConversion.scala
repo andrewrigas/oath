@@ -7,5 +7,5 @@ import io.circe.syntax.EncoderOps
 
 trait CirceClaimsEncoderConversion {
 
-  implicit def circeEncoderConversion[A](implicit encoder: Encoder[A]): ClaimsEncoder[A] = data => data.asJson.noSpaces
+  implicit def encoderConversion[A](implicit encoder: Encoder[A]): ClaimsEncoder[A] = data => data.asJson.noSpaces
 }
