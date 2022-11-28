@@ -43,7 +43,7 @@ ThisBuild / githubWorkflowAddedJobs ++= Seq(
           "codecov",
           "codecov-action",
           "v3.1.1"
-        ),
+        )
       )
     )
   )
