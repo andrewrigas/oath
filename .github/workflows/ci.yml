@@ -237,8 +237,8 @@ jobs:
       - name: Check Scalafmt and Scalafix rules
         run: sbt '++ ${{ matrix.scala }}' checkLint
 
-  coverage:
-    name: Generate coverage report
+  Codecov:
+    name: Codecov
     strategy:
       matrix:
         os: [ubuntu-latest]
@@ -279,6 +279,4 @@ jobs:
 
       - run: sbt '++ ${{ matrix.scala }}' coverage test coverageAggregate
 
-      - uses: codecov/codecov-action@v2
-        with:
-          flags: ${{matrix.scala}},${{matrix.java}}
+      - uses: codecov/codecov-action@v3.1.1
