@@ -1,8 +1,16 @@
 package io.oath.jwt
 
-import io.oath.jwt.model.{JwtClaims, RegisteredClaims}
+import eu.timepit.refined.types.string.NonEmptyString
+import io.oath.jwt.model.{JwtClaims, JwtToken, RegisteredClaims}
 
 package object syntax {
+
+  implicit class TokenOps(value: NonEmptyString) {
+    def toToken: JwtToken.Token     = JwtToken.Token(value)
+    def toTokenH: JwtToken.TokenH   = JwtToken.TokenH(value)
+    def toTokenP: JwtToken.TokenP   = JwtToken.TokenP(value)
+    def toTokenHP: JwtToken.TokenHP = JwtToken.TokenHP(value)
+  }
 
   implicit class RegisteredClaimsOps(value: RegisteredClaims) {
     def toClaims: JwtClaims.Claims = JwtClaims.Claims(value)
