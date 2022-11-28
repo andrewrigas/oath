@@ -7,7 +7,7 @@
 The JWT layer depends on [oath0/java-jwt](https://github.com/auth0/java-jwt) library. Is inspired
 by [akka-http-session](https://github.com/softwaremill/akka-http-session)
 & [scala-jwt](https://github.com/jwt-scala/jwt-scala)
-if you have already used those libraries you would probably find your self's familiar with this API.
+if you have already used those libraries you would probably find your self familiar with this API.
 
 ---
 
@@ -71,8 +71,8 @@ object JwtClaims {
 }
 ```
 
-The JWT (JSON Web Token) is described in a whole with the claims & token in
-this data structure. The token is in this form `base64(header).base64(payload).signature`.
+The JWT (JSON Web Token) is described as a whole with the `claims` & `token` in
+the below data structure. The `token` is in this form `base64(header).base64(payload).signature`.
 
 ```scala
 final case class Jwt[+C <: JwtClaims](claims: C, token: NonEmptyString)
