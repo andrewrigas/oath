@@ -280,3 +280,4 @@ jobs:
       - run: sbt '++ ${{ matrix.scala }}' coverage test coverageAggregate
 
       - uses: codecov/codecov-action@v3.1.1
+
