@@ -12,7 +12,7 @@ class IssuerLoaderSpec extends AnyWordSpecBase {
   val configFile                            = "issuer"
   val DefaultTokenConfigLocation            = "default-token"
   val TokenConfigLocation                   = "token"
-  val WithoutPrivateKeyTokenConfigLocation = "without-private-key-token"
+  val WithoutPrivateKeyTokenConfigLocation  = "without-private-key-token"
   val InvalidTokenEmptyStringConfigLocation = "invalid-token-empty-string"
   val InvalidTokenWrongTypeConfigLocation   = "invalid-token-wrong-type"
 

@@ -12,7 +12,7 @@ class VerifierLoaderSpec extends AnyWordSpecBase {
   val configFile                            = "verifier"
   val DefaultTokenConfigLocation            = "default-token"
   val TokenConfigLocation                   = "token"
-  val WithoutPublicKeyTokenConfigLocation = "without-public-key-token"
+  val WithoutPublicKeyTokenConfigLocation   = "without-public-key-token"
   val InvalidTokenEmptyStringConfigLocation = "invalid-token-empty-string"
   val InvalidTokenWrongTypeConfigLocation   = "invalid-token-wrong-type"
 
