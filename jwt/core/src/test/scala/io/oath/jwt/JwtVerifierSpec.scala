@@ -1,5 +1,6 @@
 package io.oath.jwt
 
+import cats.implicits.{catsSyntaxEitherId, catsSyntaxOptionId}
 import com.auth0.jwt.JWT
 import com.auth0.jwt.algorithms.Algorithm
 import eu.timepit.refined.types.string.NonEmptyString
@@ -7,13 +8,11 @@ import io.oath.jwt.NestedHeader._
 import io.oath.jwt.NestedPayload._
 import io.oath.jwt.config.VerifierConfig
 import io.oath.jwt.config.VerifierConfig.{LeewayWindowConfig, ProvidedWithConfig}
-import io.oath.jwt.model.{JwtToken, JwtVerifyError, RegisteredClaims}
+import io.oath.jwt.model.{JwtVerifyError, RegisteredClaims}
 import io.oath.jwt.syntax._
 import io.oath.jwt.testkit.{AnyWordSpecBase, PropertyBasedTesting}
 import io.oath.jwt.utils._
 
-import cats.implicits.catsSyntaxEitherId
-import cats.implicits.catsSyntaxOptionId
 import scala.util.chaining.scalaUtilChainingOps
 
 class JwtVerifierSpec extends AnyWordSpecBase with PropertyBasedTesting with ClockHelper {
@@ -42,7 +41,7 @@ class JwtVerifierSpec extends AnyWordSpecBase with PropertyBasedTesting with Clo
         .tap(builder => (issueAt orElse leeway).map(builder.withIssuedAt))
         .sign(config.algorithm)
 
-      val verified = jwtVerifier.verifyJwt(JwtToken.Token(NonEmptyString.unsafeFrom(token))).value
+      val verified = jwtVerifier.verifyJwt(NonEmptyString.unsafeFrom(token).toToken).value
 
       verified.registered shouldBe RegisteredClaims(
         config.providedWith.issuerClaim,
@@ -62,7 +61,7 @@ class JwtVerifierSpec extends AnyWordSpecBase with PropertyBasedTesting with Clo
         .sign(defaultConfig.algorithm)
 
       val jwtVerifier = new JwtVerifier(defaultConfig)
-      val verified    = jwtVerifier.verifyJwt[NestedHeader](JwtToken.TokenH(NonEmptyString.unsafeFrom(token)))
+      val verified    = jwtVerifier.verifyJwt[NestedHeader](NonEmptyString.unsafeFrom(token).toTokenH)
 
       verified.value shouldBe nestedHeader.toClaimsH
     }
@@ -74,7 +73,7 @@ class JwtVerifierSpec extends AnyWordSpecBase with PropertyBasedTesting with Clo
         .sign(defaultConfig.algorithm)
 
       val jwtVerifier = new JwtVerifier(defaultConfig)
-      val verified    = jwtVerifier.verifyJwt[NestedPayload](JwtToken.TokenP(NonEmptyString.unsafeFrom(token)))
+      val verified    = jwtVerifier.verifyJwt[NestedPayload](NonEmptyString.unsafeFrom(token).toTokenP)
 
       verified.value shouldBe nestedPayload.toClaimsP
     }
@@ -88,7 +87,7 @@ class JwtVerifierSpec extends AnyWordSpecBase with PropertyBasedTesting with Clo
 
       val jwtVerifier = new JwtVerifier(defaultConfig)
       val verified =
-        jwtVerifier.verifyJwt[NestedHeader, NestedPayload](JwtToken.TokenHP(NonEmptyString.unsafeFrom(token)))
+        jwtVerifier.verifyJwt[NestedHeader, NestedPayload](NonEmptyString.unsafeFrom(token).toTokenHP)
 
       verified.value shouldBe (nestedHeader, nestedPayload).toClaimsHP
     }
@@ -101,7 +100,7 @@ class JwtVerifierSpec extends AnyWordSpecBase with PropertyBasedTesting with Clo
         .sign(defaultConfig.algorithm)
 
       val jwtVerifier = new JwtVerifier(defaultConfig)
-      val verified    = jwtVerifier.verifyJwt[NestedHeader](JwtToken.TokenH(NonEmptyString.unsafeFrom(token)))
+      val verified    = jwtVerifier.verifyJwt[NestedHeader](NonEmptyString.unsafeFrom(token).toTokenH)
 
       verified shouldBe Left(JwtVerifyError.DecodingError("Missing required field: DownField(mapping)", null))
     }
@@ -114,7 +113,7 @@ class JwtVerifierSpec extends AnyWordSpecBase with PropertyBasedTesting with Clo
         .sign(defaultConfig.algorithm)
 
       val jwtVerifier = new JwtVerifier(defaultConfig)
-      val verified    = jwtVerifier.verifyJwt[NestedPayload](JwtToken.TokenP(NonEmptyString.unsafeFrom(token)))
+      val verified    = jwtVerifier.verifyJwt[NestedPayload](NonEmptyString.unsafeFrom(token).toTokenP)
 
       verified shouldBe Left(JwtVerifyError.DecodingError("Missing required field: DownField(mapping)", null))
     }
@@ -130,7 +129,7 @@ class JwtVerifierSpec extends AnyWordSpecBase with PropertyBasedTesting with Clo
 
       val jwtVerifier = new JwtVerifier(defaultConfig)
       val verified =
-        jwtVerifier.verifyJwt[NestedHeader, NestedPayload](JwtToken.TokenHP(NonEmptyString.unsafeFrom(token)))
+        jwtVerifier.verifyJwt[NestedHeader, NestedPayload](NonEmptyString.unsafeFrom(token).toTokenHP)
 
       verified shouldBe Left(
         JwtVerifyError.DecodingErrors(
@@ -145,7 +144,7 @@ class JwtVerifierSpec extends AnyWordSpecBase with PropertyBasedTesting with Clo
         .sign(defaultConfig.algorithm)
 
       val jwtVerifier = new JwtVerifier(defaultConfig)
-      val verified    = jwtVerifier.verifyJwt[SimpleHeader](JwtToken.TokenH(NonEmptyString.unsafeFrom(token)))
+      val verified    = jwtVerifier.verifyJwt[SimpleHeader](NonEmptyString.unsafeFrom(token).toTokenH)
 
       verified.left.value.error shouldBe "Boom"
     }
@@ -156,7 +155,7 @@ class JwtVerifierSpec extends AnyWordSpecBase with PropertyBasedTesting with Clo
         .sign(defaultConfig.algorithm)
 
       val jwtVerifier = new JwtVerifier(defaultConfig)
-      val verified    = jwtVerifier.verifyJwt[SimplePayload](JwtToken.TokenP(NonEmptyString.unsafeFrom(token)))
+      val verified    = jwtVerifier.verifyJwt[SimplePayload](NonEmptyString.unsafeFrom(token).toTokenP)
 
       verified.left.value.error shouldBe "Boom"
     }
@@ -168,7 +167,7 @@ class JwtVerifierSpec extends AnyWordSpecBase with PropertyBasedTesting with Clo
 
       val jwtVerifier = new JwtVerifier(defaultConfig)
       val verified =
-        jwtVerifier.verifyJwt[SimpleHeader, SimplePayload](JwtToken.TokenHP(NonEmptyString.unsafeFrom(token)))
+        jwtVerifier.verifyJwt[SimpleHeader, SimplePayload](NonEmptyString.unsafeFrom(token).toTokenHP)
 
       verified.left.value.error shouldBe "JWT Failed to decode both parts: \nheader decoding error: Boom \npayload decoding error: Boom"
     }
@@ -181,7 +180,7 @@ class JwtVerifierSpec extends AnyWordSpecBase with PropertyBasedTesting with Clo
         .sign(config.algorithm)
 
       val jwtVerifier = new JwtVerifier(config)
-      val verified    = jwtVerifier.verifyJwt(JwtToken.Token(NonEmptyString.unsafeFrom(token)))
+      val verified    = jwtVerifier.verifyJwt(NonEmptyString.unsafeFrom(token).toToken)
 
       verified shouldBe JwtVerifyError.VerificationError("The Claim 'iss' is not present in the JWT.").asLeft
     }
@@ -193,7 +192,7 @@ class JwtVerifierSpec extends AnyWordSpecBase with PropertyBasedTesting with Clo
 
       val jwtVerifier = new JwtVerifier(config.copy(algorithm = null))
 
-      val verified = jwtVerifier.verifyJwt(JwtToken.Token(NonEmptyString.unsafeFrom(token)))
+      val verified = jwtVerifier.verifyJwt(NonEmptyString.unsafeFrom(token).toToken)
 
       verified shouldBe JwtVerifyError.IllegalArgument("The Algorithm cannot be null.").asLeft
     }
@@ -205,7 +204,7 @@ class JwtVerifierSpec extends AnyWordSpecBase with PropertyBasedTesting with Clo
           .sign(config.algorithm)
 
         val jwtVerifier = new JwtVerifier(config.copy(algorithm = Algorithm.HMAC256("secret")))
-        val verified    = jwtVerifier.verifyJwt(JwtToken.Token(NonEmptyString.unsafeFrom(token)))
+        val verified    = jwtVerifier.verifyJwt(NonEmptyString.unsafeFrom(token).toToken)
 
         verified shouldBe
           JwtVerifyError
@@ -220,7 +219,7 @@ class JwtVerifierSpec extends AnyWordSpecBase with PropertyBasedTesting with Clo
           .sign(Algorithm.HMAC256("secret1"))
 
         val jwtVerifier = new JwtVerifier(config.copy(algorithm = Algorithm.HMAC256("secret2")))
-        val verified    = jwtVerifier.verifyJwt(JwtToken.Token(NonEmptyString.unsafeFrom(token)))
+        val verified    = jwtVerifier.verifyJwt(NonEmptyString.unsafeFrom(token).toToken)
 
         verified shouldBe
           JwtVerifyError
@@ -237,7 +236,7 @@ class JwtVerifierSpec extends AnyWordSpecBase with PropertyBasedTesting with Clo
         .sign(defaultConfig.algorithm)
 
       val jwtVerifier = new JwtVerifier(defaultConfig)
-      val verified    = jwtVerifier.verifyJwt(JwtToken.Token(NonEmptyString.unsafeFrom(token)))
+      val verified    = jwtVerifier.verifyJwt(NonEmptyString.unsafeFrom(token).toToken)
 
       verified shouldBe
         JwtVerifyError
