@@ -12,6 +12,7 @@ class IssuerLoaderSpec extends AnyWordSpecBase {
   val configFile                            = "issuer"
   val DefaultTokenConfigLocation            = "default-token"
   val TokenConfigLocation                   = "token"
+  val WithoutPrivateKeyTokenConfigLocation = "without-private-key-token"
   val InvalidTokenEmptyStringConfigLocation = "invalid-token-empty-string"
   val InvalidTokenWrongTypeConfigLocation   = "invalid-token-wrong-type"
 
@@ -58,13 +59,19 @@ class IssuerLoaderSpec extends AnyWordSpecBase {
       config.algorithm.getName shouldBe "RS256"
     }
 
-    "load invalid-token-empty-string issuer config values from configuration file" in {
+    "fail to load without-private-key-token issuer config values from configuration file" in {
+      val configLoader = ConfigFactory.load(configFile).getConfig(WithoutPrivateKeyTokenConfigLocation)
+
+      the[ConfigException.Missing] thrownBy IssuerConfig.loadOrThrow(configLoader)
+    }
+
+    "fail to load invalid-token-empty-string issuer config values from configuration file" in {
       val configLoader = ConfigFactory.load(configFile).getConfig(InvalidTokenEmptyStringConfigLocation)
 
       the[IllegalArgumentException] thrownBy IssuerConfig.loadOrThrow(configLoader)
     }
 
-    "load invalid-token-wrong-type issuer config values from configuration file" in {
+    "failt to load invalid-token-wrong-type issuer config values from configuration file" in {
       val configLoader = ConfigFactory.load(configFile).getConfig(InvalidTokenWrongTypeConfigLocation)
 
       the[ConfigException.BadValue] thrownBy IssuerConfig.loadOrThrow(configLoader)

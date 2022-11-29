@@ -12,6 +12,7 @@ class VerifierLoaderSpec extends AnyWordSpecBase {
   val configFile                            = "verifier"
   val DefaultTokenConfigLocation            = "default-token"
   val TokenConfigLocation                   = "token"
+  val WithoutPublicKeyTokenConfigLocation = "without-public-key-token"
   val InvalidTokenEmptyStringConfigLocation = "invalid-token-empty-string"
   val InvalidTokenWrongTypeConfigLocation   = "invalid-token-wrong-type"
 
@@ -58,13 +59,21 @@ class VerifierLoaderSpec extends AnyWordSpecBase {
       config.algorithm.getName shouldBe "RS256"
     }
 
-    "load invalid-token-empty-string verifier config values from configuration file" in {
-      val configLoader = ConfigFactory.load(configFile).getConfig(InvalidTokenEmptyStringConfigLocation)
-      the[java.lang.IllegalArgumentException] thrownBy VerifierConfig.loadOrThrow(configLoader)
+    "fail to load without-public-key-token verifier config values from configuration file" in {
+      val configLoader = ConfigFactory.load(configFile).getConfig(WithoutPublicKeyTokenConfigLocation)
+
+      the[ConfigException.Missing] thrownBy VerifierConfig.loadOrThrow(configLoader)
     }
 
-    "load invalid-token-wrong-type verifier config values from configuration file" in {
+    "fail to load invalid-token-empty-string verifier config values from configuration file" in {
+      val configLoader = ConfigFactory.load(configFile).getConfig(InvalidTokenEmptyStringConfigLocation)
+
+      the[IllegalArgumentException] thrownBy VerifierConfig.loadOrThrow(configLoader)
+    }
+
+    "fail to load invalid-token-wrong-type verifier config values from configuration file" in {
       val configLoader = ConfigFactory.load(configFile).getConfig(InvalidTokenWrongTypeConfigLocation)
+
       the[ConfigException.WrongType] thrownBy VerifierConfig.loadOrThrow(configLoader)
     }
   }
