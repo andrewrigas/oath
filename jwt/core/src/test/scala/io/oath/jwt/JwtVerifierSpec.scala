@@ -1,6 +1,5 @@
 package io.oath.jwt
 
-import cats.implicits.{catsSyntaxEitherId, catsSyntaxOptionId}
 import com.auth0.jwt.JWT
 import com.auth0.jwt.algorithms.Algorithm
 import eu.timepit.refined.types.string.NonEmptyString
@@ -13,6 +12,8 @@ import io.oath.jwt.syntax._
 import io.oath.jwt.testkit.{AnyWordSpecBase, PropertyBasedTesting}
 import io.oath.jwt.utils._
 
+import cats.implicits.catsSyntaxEitherId
+import cats.implicits.catsSyntaxOptionId
 import scala.util.chaining.scalaUtilChainingOps
 
 class JwtVerifierSpec extends AnyWordSpecBase with PropertyBasedTesting with ClockHelper {
