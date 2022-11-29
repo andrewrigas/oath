@@ -71,6 +71,7 @@ lazy val jwtJsoniterScala = Projects
 
 lazy val juror = Projects
   .createModule("juror", "juror/core")
+  .enablePlugins(NoPublishPlugin)
   .dependsOn(jwtCore % "compile->compile;test->test")
   .dependsOn(csrfCore % "compile->compile;test->test")
 
