@@ -7,7 +7,7 @@ import io.oath.jwt.testkit.AnyWordSpecBase
 import cats.implicits.catsSyntaxOptionId
 import scala.concurrent.duration.DurationInt
 
-class ManagerLoaderSpec extends AnyWordSpecBase {
+class JwtManagerLoaderSpec extends AnyWordSpecBase {
 
   val configFile          = "manager"
   val TokenConfigLocation = "token"
@@ -17,7 +17,7 @@ class ManagerLoaderSpec extends AnyWordSpecBase {
     "load default-token verifier config values from configuration file" in {
       val configLoader = ConfigFactory.load(configFile).getConfig(TokenConfigLocation)
 
-      val config = ManagerConfig.loadOrThrow(configLoader)
+      val config = JwtManagerConfig.loadOrThrow(configLoader)
 
       config.issuer.registered.issuerClaim shouldBe NonEmptyString.unapply("issuer")
       config.issuer.registered.subjectClaim shouldBe NonEmptyString.unapply("subject")

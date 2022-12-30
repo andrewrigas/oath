@@ -5,20 +5,20 @@ import eu.timepit.refined.types.string.NonEmptyString
 
 import scala.util.chaining.scalaUtilChainingOps
 
-final case class CsrfConfig(secret: NonEmptyString)
+final case class CsrfManagerConfig(secret: NonEmptyString)
 
-object CsrfConfig {
+object CsrfManagerConfig {
   private val CsrfConfigLocation   = "csrf"
-  private val SecretKeyConfigValue = "secret-key"
+  private val SecretKeyConfigValue = "secret"
 
-  def loadOrThrow(config: Config): CsrfConfig =
+  def loadOrThrow(config: Config): CsrfManagerConfig =
     config
       .getConfig(CsrfConfigLocation)
       .getString(SecretKeyConfigValue)
       .pipe(NonEmptyString.unsafeFrom)
-      .pipe(CsrfConfig(_))
+      .pipe(CsrfManagerConfig(_))
 
-  def loadOrThrow(location: String): CsrfConfig = {
+  def loadOrThrow(location: String): CsrfManagerConfig = {
     val configLocation = ConfigFactory.load().getConfig(location)
     loadOrThrow(configLocation)
   }

@@ -12,7 +12,7 @@ import scala.jdk.DurationConverters.JavaDurationOps
 
 package object config {
 
-  implicit class ConfigOps(private val config: Config) {
+  private[config] implicit class ConfigOps(private val config: Config) {
 
     private def ifMissingDefault[T](default: T): PartialFunction[Throwable, T] = { case _: ConfigException.Missing =>
       default

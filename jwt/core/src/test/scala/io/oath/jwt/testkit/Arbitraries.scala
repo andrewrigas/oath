@@ -6,9 +6,9 @@ import com.auth0.jwt.algorithms.Algorithm
 import eu.timepit.refined.types.string.NonEmptyString
 import io.oath.jwt.NestedHeader.SimpleHeader
 import io.oath.jwt.NestedPayload.SimplePayload
-import io.oath.jwt.config.IssuerConfig.RegisteredConfig
-import io.oath.jwt.config.VerifierConfig.{LeewayWindowConfig, ProvidedWithConfig}
-import io.oath.jwt.config.{IssuerConfig, ManagerConfig, VerifierConfig}
+import io.oath.jwt.config.JwtIssuerConfig.RegisteredConfig
+import io.oath.jwt.config.JwtVerifierConfig.{LeewayWindowConfig, ProvidedWithConfig}
+import io.oath.jwt.config.{JwtIssuerConfig, JwtManagerConfig, JwtVerifierConfig}
 import io.oath.jwt.model.RegisteredClaims
 import io.oath.jwt.{NestedHeader, NestedPayload}
 import org.scalacheck.{Arbitrary, Gen}
@@ -28,7 +28,7 @@ trait Arbitraries {
     Gen.chooseNum(Long.MinValue, Long.MaxValue).map(Instant.ofEpochMilli)
   )
 
-  implicit val issuerConfigArbitrary: Arbitrary[IssuerConfig] = Arbitrary {
+  implicit val issuerConfigArbitrary: Arbitrary[JwtIssuerConfig] = Arbitrary {
     for {
       issuerClaim         <- Gen.option(genNonEmptyString)
       subjectClaim        <- Gen.option(genNonEmptyString)
@@ -44,10 +44,10 @@ trait Arbitraries {
                                     includeIssueAtClaim,
                                     expiresAtOffset,
                                     notBeforeOffset)
-    } yield IssuerConfig(Algorithm.none(), registered)
+    } yield JwtIssuerConfig(Algorithm.none(), registered)
   }
 
-  implicit val verifierConfigArbitrary: Arbitrary[VerifierConfig] = Arbitrary {
+  implicit val verifierConfigArbitrary: Arbitrary[JwtVerifierConfig] = Arbitrary {
     for {
       issuerClaim    <- Gen.option(genNonEmptyString)
       subjectClaim   <- Gen.option(genNonEmptyString)
@@ -58,10 +58,10 @@ trait Arbitraries {
       notBefore      <- Gen.option(genPositiveFiniteDurationSeconds)
       leewayWindow = LeewayWindowConfig(leeway, issuedAt, expiresAt, notBefore)
       providedWith = ProvidedWithConfig(issuerClaim, subjectClaim, audienceClaims)
-    } yield VerifierConfig(Algorithm.none(), providedWith, leewayWindow)
+    } yield JwtVerifierConfig(Algorithm.none(), providedWith, leewayWindow)
   }
 
-  implicit val managerConfigArbitrary: Arbitrary[ManagerConfig] = Arbitrary {
+  implicit val managerConfigArbitrary: Arbitrary[JwtManagerConfig] = Arbitrary {
     for {
       issuerClaim         <- Gen.option(genNonEmptyString)
       subjectClaim        <- Gen.option(genNonEmptyString)
@@ -83,9 +83,9 @@ trait Arbitraries {
                                     includeIssueAtClaim,
                                     expiresAtOffset,
                                     notBeforeOffset)
-      verifier = VerifierConfig(Algorithm.none(), providedWith, leewayWindow)
-      issuer   = IssuerConfig(Algorithm.none(), registered)
-    } yield ManagerConfig(issuer, verifier)
+      verifier = JwtVerifierConfig(Algorithm.none(), providedWith, leewayWindow)
+      issuer   = JwtIssuerConfig(Algorithm.none(), registered)
+    } yield JwtManagerConfig(issuer, verifier)
   }
 
   implicit val registeredClaimsArbitrary: Arbitrary[RegisteredClaims] = Arbitrary {

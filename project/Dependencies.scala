@@ -17,6 +17,8 @@ object Dependencies {
     val refined            = "0.10.1"
     val circe              = "0.14.3"
     val jsoniterScala      = "2.18.1"
+    val guava              = "31.1-jre"
+    val enumeratum         = "1.7.2"
   }
 
   object Testing {
@@ -51,13 +53,16 @@ object Dependencies {
   }
 
   object Utils {
-    val config  = "com.typesafe"               % "config"           % Versions.config
-    val cats    = "org.typelevel"             %% "cats-core"        % Versions.cats
-    val bcprov  = "org.bouncycastle"           % "bcprov-jdk18on"   % Versions.bcprov
-    val jackson = "com.fasterxml.jackson.core" % "jackson-databind" % Versions.jackson
+    val config     = "com.typesafe"               % "config"           % Versions.config
+    val cats       = "org.typelevel"             %% "cats-core"        % Versions.cats
+    val bcprov     = "org.bouncycastle"           % "bcprov-jdk18on"   % Versions.bcprov
+    val jackson    = "com.fasterxml.jackson.core" % "jackson-databind" % Versions.jackson
+    val guava      = "com.google.guava"           % "guava"            % Versions.guava
+    val enumeratum = "com.beachape"              %% "enumeratum"       % Versions.enumeratum
 
-    val jwt  = Seq(config, cats, bcprov, jackson)
-    val csrf = Seq(config, cats)
+    val juror = Seq(guava, enumeratum)
+    val jwt   = Seq(config, cats, bcprov, jackson)
+    val csrf  = Seq(config, cats)
   }
 
   object Auth0 {
@@ -77,4 +82,7 @@ object Dependencies {
 
   lazy val csrfCore =
     libraryDependencies ++= Refined.all ++ Utils.csrf ++ Testing.all
+
+  lazy val juror =
+    libraryDependencies ++= Utils.juror
 }

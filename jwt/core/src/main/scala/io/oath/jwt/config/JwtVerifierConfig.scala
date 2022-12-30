@@ -3,17 +3,16 @@ package io.oath.jwt.config
 import com.auth0.jwt.algorithms.Algorithm
 import com.typesafe.config.{Config, ConfigFactory}
 import eu.timepit.refined.types.string.NonEmptyString
+import io.oath.jwt.config.JwtVerifierConfig._
 
 import scala.concurrent.duration.FiniteDuration
 
-import VerifierConfig._
-
-final case class VerifierConfig(algorithm: Algorithm,
-                                providedWith: ProvidedWithConfig,
-                                leewayWindow: LeewayWindowConfig
+final case class JwtVerifierConfig(algorithm: Algorithm,
+                                   providedWith: ProvidedWithConfig,
+                                   leewayWindow: LeewayWindowConfig
 )
 
-object VerifierConfig {
+object JwtVerifierConfig {
 
   final case class ProvidedWithConfig(issuerClaim: Option[NonEmptyString] = None,
                                       subjectClaim: Option[NonEmptyString] = None,
@@ -46,7 +45,7 @@ object VerifierConfig {
     LeewayWindowConfig(leeway, issuedAt, expiresAt, notBefore)
   }
 
-  def loadOrThrow(config: Config): VerifierConfig = {
+  def loadOrThrow(config: Config): JwtVerifierConfig = {
     val maybeVerificationScoped = config.getMaybeConfig(VerifierConfigLocation)
     val algorithm = AlgorithmLoader.loadAlgorithmOrThrow(config.getConfig(AlgorithmConfigLocation), forIssuing = false)
     val providedWith =
@@ -61,12 +60,12 @@ object VerifierConfig {
         leewayWindowScoped <- verificationScoped.getMaybeConfig(LeewayWindowConfigLocation)
       } yield loadOrThrowLeewayWindowConfig(leewayWindowScoped)
 
-    VerifierConfig(algorithm,
-                   providedWith.getOrElse(ProvidedWithConfig()),
-                   leewayWindow.getOrElse(LeewayWindowConfig()))
+    JwtVerifierConfig(algorithm,
+                      providedWith.getOrElse(ProvidedWithConfig()),
+                      leewayWindow.getOrElse(LeewayWindowConfig()))
   }
 
-  def loadOrThrow(location: String): VerifierConfig = {
+  def loadOrThrow(location: String): JwtVerifierConfig = {
     val configLocation = ConfigFactory.load().getConfig(location)
     loadOrThrow(configLocation)
   }

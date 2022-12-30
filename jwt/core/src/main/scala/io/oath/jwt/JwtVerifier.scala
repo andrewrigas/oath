@@ -4,7 +4,7 @@ import cats.syntax.all._
 import com.auth0.jwt.exceptions._
 import com.auth0.jwt.interfaces.DecodedJWT
 import com.auth0.jwt.{JWT, JWTVerifier}
-import io.oath.jwt.config.VerifierConfig
+import io.oath.jwt.config.JwtVerifierConfig
 import io.oath.jwt.model.{JwtClaims, JwtToken, JwtVerifyError, RegisteredClaims}
 import io.oath.jwt.utils._
 
@@ -12,7 +12,7 @@ import scala.util.control.Exception.allCatch
 
 import scala.util.chaining.scalaUtilChainingOps
 
-final class JwtVerifier(config: VerifierConfig, customJWTVerifier: Option[JWTVerifier] = None) {
+final class JwtVerifier(config: JwtVerifierConfig, customJWTVerifier: Option[JWTVerifier] = None) {
 
   private lazy val jwtVerifier =
     customJWTVerifier.getOrElse(

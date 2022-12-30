@@ -9,8 +9,6 @@ object Projects {
 
   def createModule(moduleName: String, fileName: String): Project =
     Project(moduleName, base = file(fileName))
-      .settings(CompilerOptions.inCompile)
-      .settings(CompilerOptions.inTest)
       .settings(
         Test / fork := true,
         run / fork := true,

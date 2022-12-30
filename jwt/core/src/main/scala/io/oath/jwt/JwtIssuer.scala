@@ -7,7 +7,7 @@ import java.util.UUID
 import com.auth0.jwt.exceptions.JWTCreationException
 import com.auth0.jwt.{JWT, JWTCreator}
 import eu.timepit.refined.types.string.NonEmptyString
-import io.oath.jwt.config.IssuerConfig
+import io.oath.jwt.config.JwtIssuerConfig
 import io.oath.jwt.model.{IssueJwtError, Jwt, JwtClaims, RegisteredClaims}
 import io.oath.jwt.utils.unsafeParseJsonToJavaMap
 
@@ -15,7 +15,7 @@ import scala.util.control.Exception.allCatch
 
 import scala.util.chaining.scalaUtilChainingOps
 
-final class JwtIssuer(config: IssuerConfig, clock: Clock = Clock.systemUTC()) {
+final class JwtIssuer(config: JwtIssuerConfig, clock: Clock = Clock.systemUTC()) {
 
   private val jwtBuilder: JWTCreator.Builder = JWT.create()
 

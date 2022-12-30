@@ -2,14 +2,14 @@ package io.oath.csrf
 
 import eu.timepit.refined.auto._
 import eu.timepit.refined.types.string.NonEmptyString
-import io.oath.csrf.config.CsrfConfig
+import io.oath.csrf.config.CsrfManagerConfig
 import io.oath.csrf.model.{CsrfParts, CsrfToken}
 import javax.crypto.Mac
 import javax.crypto.spec.SecretKeySpec
 
 import scala.util.chaining.scalaUtilChainingOps
 
-class CsrfManager(config: CsrfConfig) {
+final class CsrfManager(config: CsrfManagerConfig) {
 
   import config._
 
