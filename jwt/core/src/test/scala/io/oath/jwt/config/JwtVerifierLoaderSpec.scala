@@ -7,7 +7,7 @@ import io.oath.jwt.testkit.AnyWordSpecBase
 import cats.implicits.catsSyntaxOptionId
 import scala.concurrent.duration.DurationInt
 
-class VerifierLoaderSpec extends AnyWordSpecBase {
+class JwtVerifierLoaderSpec extends AnyWordSpecBase {
 
   val configFile                            = "verifier"
   val DefaultTokenConfigLocation            = "default-token"
@@ -21,7 +21,7 @@ class VerifierLoaderSpec extends AnyWordSpecBase {
     "load default-token verifier config values from configuration file" in {
       val configLoader = ConfigFactory.load(configFile).getConfig(DefaultTokenConfigLocation)
 
-      val config = VerifierConfig.loadOrThrow(configLoader)
+      val config = JwtVerifierConfig.loadOrThrow(configLoader)
       config.providedWith.issuerClaim shouldBe None
       config.providedWith.subjectClaim shouldBe None
       config.providedWith.audienceClaims shouldBe Seq.empty
@@ -36,7 +36,7 @@ class VerifierLoaderSpec extends AnyWordSpecBase {
     "load token verifier config values from configuration file" in {
       val configLoader = ConfigFactory.load(configFile).getConfig(TokenConfigLocation)
 
-      val config = VerifierConfig.loadOrThrow(configLoader)
+      val config = JwtVerifierConfig.loadOrThrow(configLoader)
       config.providedWith.issuerClaim shouldBe NonEmptyString.unapply("issuer")
       config.providedWith.subjectClaim shouldBe NonEmptyString.unapply("subject")
       config.providedWith.audienceClaims shouldBe Seq("aud1", "aud2").map(NonEmptyString.unsafeFrom)
@@ -48,7 +48,7 @@ class VerifierLoaderSpec extends AnyWordSpecBase {
     }
 
     "load token verifier config values from reference configuration file using location" in {
-      val config = VerifierConfig.loadOrThrow(TokenConfigLocation)
+      val config = JwtVerifierConfig.loadOrThrow(TokenConfigLocation)
       config.providedWith.issuerClaim shouldBe NonEmptyString.unapply("issuer")
       config.providedWith.subjectClaim shouldBe NonEmptyString.unapply("subject")
       config.providedWith.audienceClaims shouldBe Seq("aud1", "aud2").map(NonEmptyString.unsafeFrom)
@@ -62,19 +62,19 @@ class VerifierLoaderSpec extends AnyWordSpecBase {
     "fail to load without-public-key-token verifier config values from configuration file" in {
       val configLoader = ConfigFactory.load(configFile).getConfig(WithoutPublicKeyTokenConfigLocation)
 
-      the[ConfigException.Missing] thrownBy VerifierConfig.loadOrThrow(configLoader)
+      the[ConfigException.Missing] thrownBy JwtVerifierConfig.loadOrThrow(configLoader)
     }
 
     "fail to load invalid-token-empty-string verifier config values from configuration file" in {
       val configLoader = ConfigFactory.load(configFile).getConfig(InvalidTokenEmptyStringConfigLocation)
 
-      the[IllegalArgumentException] thrownBy VerifierConfig.loadOrThrow(configLoader)
+      the[IllegalArgumentException] thrownBy JwtVerifierConfig.loadOrThrow(configLoader)
     }
 
     "fail to load invalid-token-wrong-type verifier config values from configuration file" in {
       val configLoader = ConfigFactory.load(configFile).getConfig(InvalidTokenWrongTypeConfigLocation)
 
-      the[ConfigException.WrongType] thrownBy VerifierConfig.loadOrThrow(configLoader)
+      the[ConfigException.WrongType] thrownBy JwtVerifierConfig.loadOrThrow(configLoader)
     }
   }
 }

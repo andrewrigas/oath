@@ -4,9 +4,9 @@ import com.auth0.jwt.JWT
 import com.auth0.jwt.algorithms.Algorithm
 import eu.timepit.refined.auto._
 import eu.timepit.refined.types.string.NonEmptyString
-import io.oath.jwt.config.IssuerConfig.RegisteredConfig
-import io.oath.jwt.config.VerifierConfig.{LeewayWindowConfig, ProvidedWithConfig}
-import io.oath.jwt.config.{IssuerConfig, VerifierConfig}
+import io.oath.jwt.config.JwtIssuerConfig.RegisteredConfig
+import io.oath.jwt.config.JwtVerifierConfig.{LeewayWindowConfig, ProvidedWithConfig}
+import io.oath.jwt.config.{JwtIssuerConfig, JwtVerifierConfig}
 import io.oath.jwt.model.{JwtClaims, JwtVerifyError, RegisteredClaims}
 import io.oath.jwt.syntax._
 import io.oath.jwt.testkit.AnyWordSpecBase
@@ -18,12 +18,13 @@ import scala.util.chaining.scalaUtilChainingOps
 class CirceConversionSpec extends AnyWordSpecBase {
 
   val verifierConfig =
-    VerifierConfig(Algorithm.HMAC256("secret"),
-                   ProvidedWithConfig(None, None, Nil),
-                   LeewayWindowConfig(None, None, None, None))
+    JwtVerifierConfig(Algorithm.HMAC256("secret"),
+                      ProvidedWithConfig(None, None, Nil),
+                      LeewayWindowConfig(None, None, None, None))
   val issuerConfig =
-    IssuerConfig(Algorithm.HMAC256("secret"),
-                 RegisteredConfig(None, None, Nil, includeJwtIdClaim = false, includeIssueAtClaim = false, None, None))
+    JwtIssuerConfig(
+      Algorithm.HMAC256("secret"),
+      RegisteredConfig(None, None, Nil, includeJwtIdClaim = false, includeIssueAtClaim = false, None, None))
 
   val jwtVerifier = new JwtVerifier(verifierConfig)
   val jwtIssuer   = new JwtIssuer(issuerConfig)

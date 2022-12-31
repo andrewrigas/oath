@@ -5,7 +5,7 @@ import com.auth0.jwt.algorithms.Algorithm
 import eu.timepit.refined.types.string.NonEmptyString
 import io.oath.jwt.NestedHeader._
 import io.oath.jwt.NestedPayload._
-import io.oath.jwt.config.IssuerConfig
+import io.oath.jwt.config.JwtIssuerConfig
 import io.oath.jwt.model.{IssueJwtError, RegisteredClaims}
 import io.oath.jwt.syntax._
 import io.oath.jwt.testkit.{AnyWordSpecBase, PropertyBasedTesting}
@@ -31,7 +31,7 @@ class JwtIssuerSpec extends AnyWordSpecBase with PropertyBasedTesting with Clock
 
     "issue jwt tokens" when {
 
-      "issue token with predefine configure claims" in forAll { config: IssuerConfig =>
+      "issue token with predefine configure claims" in forAll { config: JwtIssuerConfig =>
         val jwtIssuer = new JwtIssuer(config, clock)
         val jwtClaims = jwtIssuer.issueJwt().value
 
@@ -60,7 +60,7 @@ class JwtIssuerSpec extends AnyWordSpecBase with PropertyBasedTesting with Clock
       }
 
       "issue token with predefine configure claims and ad-hoc registered claims" in forAll {
-        (registeredClaims: RegisteredClaims, config: IssuerConfig) =>
+        (registeredClaims: RegisteredClaims, config: JwtIssuerConfig) =>
           val jwtIssuer = new JwtIssuer(config, clock)
           val jwtClaims = jwtIssuer.issueJwt(registeredClaims.toClaims).value
 
@@ -91,7 +91,7 @@ class JwtIssuerSpec extends AnyWordSpecBase with PropertyBasedTesting with Clock
       }
 
       "issue token with registered claims when decoded should have the same values with the return registered claims" in forAll {
-        (registeredClaims: RegisteredClaims, config: IssuerConfig) =>
+        (registeredClaims: RegisteredClaims, config: JwtIssuerConfig) =>
           val adHocRegisteredClaims =
             registeredClaims.copy(iat = now.some, exp = now.plusSeconds(5.minutes.toSeconds).some, nbf = now.some)
           val jwtIssuer = new JwtIssuer(config, clock)
@@ -112,7 +112,7 @@ class JwtIssuerSpec extends AnyWordSpecBase with PropertyBasedTesting with Clock
           Try(decodedJWT.getNotBefore.toInstant).toOption shouldBe jwtClaims.claims.registered.nbf
       }
 
-      "issue token with header claims" in forAll { (config: IssuerConfig, header: NestedHeader) =>
+      "issue token with header claims" in forAll { (config: JwtIssuerConfig, header: NestedHeader) =>
         val jwtIssuer = new JwtIssuer(config)
         val jwt       = jwtIssuer.issueJwt(header.toClaimsH).value
 
@@ -127,7 +127,7 @@ class JwtIssuerSpec extends AnyWordSpecBase with PropertyBasedTesting with Clock
         result shouldBe header
       }
 
-      "issue token with payload claims" in forAll { (config: IssuerConfig, payload: NestedPayload) =>
+      "issue token with payload claims" in forAll { (config: JwtIssuerConfig, payload: NestedPayload) =>
         val jwtIssuer = new JwtIssuer(config)
         val jwt       = jwtIssuer.issueJwt(payload.toClaimsP).value
 
@@ -143,7 +143,7 @@ class JwtIssuerSpec extends AnyWordSpecBase with PropertyBasedTesting with Clock
       }
 
       "issue token with header & payload claims" in forAll {
-        (config: IssuerConfig, header: NestedHeader, payload: NestedPayload) =>
+        (config: JwtIssuerConfig, header: NestedHeader, payload: NestedPayload) =>
           val jwtIssuer = new JwtIssuer(config)
           val jwt       = jwtIssuer.issueJwt((header, payload).toClaimsHP).value
 
@@ -159,11 +159,12 @@ class JwtIssuerSpec extends AnyWordSpecBase with PropertyBasedTesting with Clock
           payloadResult shouldBe payload
       }
 
-      "issue token should fail with IllegalArgument when algorithm is set to null" in forAll { config: IssuerConfig =>
-        val jwtIssuer = new JwtIssuer(config.copy(algorithm = null))
-        val jwt       = jwtIssuer.issueJwt()
+      "issue token should fail with IllegalArgument when algorithm is set to null" in forAll {
+        config: JwtIssuerConfig =>
+          val jwtIssuer = new JwtIssuer(config.copy(algorithm = null))
+          val jwt       = jwtIssuer.issueJwt()
 
-        jwt shouldBe IssueJwtError.IllegalArgument("The Algorithm cannot be null.").asLeft
+          jwt shouldBe IssueJwtError.IllegalArgument("The Algorithm cannot be null.").asLeft
       }
     }
   }

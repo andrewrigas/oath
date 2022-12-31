@@ -5,8 +5,8 @@ import com.auth0.jwt.algorithms.Algorithm
 import eu.timepit.refined.types.string.NonEmptyString
 import io.oath.jwt.NestedHeader._
 import io.oath.jwt.NestedPayload._
-import io.oath.jwt.config.VerifierConfig
-import io.oath.jwt.config.VerifierConfig.{LeewayWindowConfig, ProvidedWithConfig}
+import io.oath.jwt.config.JwtVerifierConfig
+import io.oath.jwt.config.JwtVerifierConfig.{LeewayWindowConfig, ProvidedWithConfig}
 import io.oath.jwt.model.{JwtVerifyError, RegisteredClaims}
 import io.oath.jwt.syntax._
 import io.oath.jwt.testkit.{AnyWordSpecBase, PropertyBasedTesting}
@@ -19,11 +19,11 @@ import scala.util.chaining.scalaUtilChainingOps
 class JwtVerifierSpec extends AnyWordSpecBase with PropertyBasedTesting with ClockHelper {
 
   val defaultConfig =
-    VerifierConfig(Algorithm.none(), ProvidedWithConfig(None, None, Nil), LeewayWindowConfig(None, None, None, None))
+    JwtVerifierConfig(Algorithm.none(), ProvidedWithConfig(None, None, Nil), LeewayWindowConfig(None, None, None, None))
 
   "JwtVerifier" should {
 
-    "verify token with prerequisite configurations" in forAll { config: VerifierConfig =>
+    "verify token with prerequisite configurations" in forAll { config: JwtVerifierConfig =>
       val jwtVerifier = new JwtVerifier(config)
 
       val leeway    = config.leewayWindow.leeway.map(leeway => now.plusSeconds(leeway.toSeconds - 1))
@@ -186,7 +186,7 @@ class JwtVerifierSpec extends AnyWordSpecBase with PropertyBasedTesting with Clo
       verified shouldBe JwtVerifyError.VerificationError("The Claim 'iss' is not present in the JWT.").asLeft
     }
 
-    "fail to verify token with IllegalArgument when null algorithm is provided" in forAll { config: VerifierConfig =>
+    "fail to verify token with IllegalArgument when null algorithm is provided" in forAll { config: JwtVerifierConfig =>
       val token = JWT
         .create()
         .sign(config.algorithm)
@@ -199,7 +199,7 @@ class JwtVerifierSpec extends AnyWordSpecBase with PropertyBasedTesting with Clo
     }
 
     "fail to verify token with AlgorithmMismatch when jwt header algorithm doesn't match with verify" in forAll {
-      config: VerifierConfig =>
+      config: JwtVerifierConfig =>
         val token = JWT
           .create()
           .sign(config.algorithm)
@@ -214,7 +214,7 @@ class JwtVerifierSpec extends AnyWordSpecBase with PropertyBasedTesting with Clo
     }
 
     "fail to verify token with SignatureVerificationError when secrets provided are wrong" in forAll {
-      config: VerifierConfig =>
+      config: JwtVerifierConfig =>
         val token = JWT
           .create()
           .sign(Algorithm.HMAC256("secret1"))

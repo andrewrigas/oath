@@ -3,9 +3,9 @@ package io.oath.jwt.jsoniter
 import com.auth0.jwt.JWT
 import com.auth0.jwt.algorithms.Algorithm
 import eu.timepit.refined.types.string.NonEmptyString
-import io.oath.jwt.config.IssuerConfig.RegisteredConfig
-import io.oath.jwt.config.VerifierConfig.{LeewayWindowConfig, ProvidedWithConfig}
-import io.oath.jwt.config.{IssuerConfig, VerifierConfig}
+import io.oath.jwt.config.JwtIssuerConfig.RegisteredConfig
+import io.oath.jwt.config.JwtVerifierConfig.{LeewayWindowConfig, ProvidedWithConfig}
+import io.oath.jwt.config.{JwtIssuerConfig, JwtVerifierConfig}
 import io.oath.jwt.model.{JwtClaims, JwtToken, JwtVerifyError}
 import io.oath.jwt.testkit.AnyWordSpecBase
 import io.oath.jwt.utils._
@@ -16,10 +16,11 @@ import scala.util.chaining.scalaUtilChainingOps
 class JsoniterConversionSpec extends AnyWordSpecBase {
 
   val verifierConfig =
-    VerifierConfig(Algorithm.none(), ProvidedWithConfig(None, None, Nil), LeewayWindowConfig(None, None, None, None))
+    JwtVerifierConfig(Algorithm.none(), ProvidedWithConfig(None, None, Nil), LeewayWindowConfig(None, None, None, None))
   val issuerConfig =
-    IssuerConfig(Algorithm.none(),
-                 RegisteredConfig(None, None, Nil, includeJwtIdClaim = false, includeIssueAtClaim = false, None, None))
+    JwtIssuerConfig(
+      Algorithm.none(),
+      RegisteredConfig(None, None, Nil, includeJwtIdClaim = false, includeIssueAtClaim = false, None, None))
 
   val jwtVerifier = new JwtVerifier(verifierConfig)
   val jwtIssuer   = new JwtIssuer(issuerConfig)

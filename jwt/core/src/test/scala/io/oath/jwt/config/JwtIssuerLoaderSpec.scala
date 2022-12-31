@@ -7,7 +7,7 @@ import io.oath.jwt.testkit.AnyWordSpecBase
 import cats.implicits.catsSyntaxOptionId
 import scala.concurrent.duration.DurationInt
 
-class IssuerLoaderSpec extends AnyWordSpecBase {
+class JwtIssuerLoaderSpec extends AnyWordSpecBase {
 
   val configFile                            = "issuer"
   val DefaultTokenConfigLocation            = "default-token"
@@ -20,7 +20,7 @@ class IssuerLoaderSpec extends AnyWordSpecBase {
 
     "load default-token issuer config values from configuration file" in {
       val configLoader = ConfigFactory.load(configFile).getConfig(DefaultTokenConfigLocation)
-      val config       = IssuerConfig.loadOrThrow(configLoader)
+      val config       = JwtIssuerConfig.loadOrThrow(configLoader)
 
       config.registered.issuerClaim shouldBe None
       config.registered.subjectClaim shouldBe None
@@ -34,7 +34,7 @@ class IssuerLoaderSpec extends AnyWordSpecBase {
 
     "load token issuer config values from configuration file" in {
       val configLoader = ConfigFactory.load(configFile).getConfig(TokenConfigLocation)
-      val config       = IssuerConfig.loadOrThrow(configLoader)
+      val config       = JwtIssuerConfig.loadOrThrow(configLoader)
 
       config.registered.issuerClaim shouldBe NonEmptyString.unapply("issuer")
       config.registered.subjectClaim shouldBe NonEmptyString.unapply("subject")
@@ -47,7 +47,7 @@ class IssuerLoaderSpec extends AnyWordSpecBase {
     }
 
     "load token issuer config values from reference configuration file using location" in {
-      val config = IssuerConfig.loadOrThrow(TokenConfigLocation)
+      val config = JwtIssuerConfig.loadOrThrow(TokenConfigLocation)
 
       config.registered.issuerClaim shouldBe NonEmptyString.unapply("issuer")
       config.registered.subjectClaim shouldBe NonEmptyString.unapply("subject")
@@ -62,19 +62,19 @@ class IssuerLoaderSpec extends AnyWordSpecBase {
     "fail to load without-private-key-token issuer config values from configuration file" in {
       val configLoader = ConfigFactory.load(configFile).getConfig(WithoutPrivateKeyTokenConfigLocation)
 
-      the[ConfigException.Missing] thrownBy IssuerConfig.loadOrThrow(configLoader)
+      the[ConfigException.Missing] thrownBy JwtIssuerConfig.loadOrThrow(configLoader)
     }
 
     "fail to load invalid-token-empty-string issuer config values from configuration file" in {
       val configLoader = ConfigFactory.load(configFile).getConfig(InvalidTokenEmptyStringConfigLocation)
 
-      the[IllegalArgumentException] thrownBy IssuerConfig.loadOrThrow(configLoader)
+      the[IllegalArgumentException] thrownBy JwtIssuerConfig.loadOrThrow(configLoader)
     }
 
     "failt to load invalid-token-wrong-type issuer config values from configuration file" in {
       val configLoader = ConfigFactory.load(configFile).getConfig(InvalidTokenWrongTypeConfigLocation)
 
-      the[ConfigException.BadValue] thrownBy IssuerConfig.loadOrThrow(configLoader)
+      the[ConfigException.BadValue] thrownBy JwtIssuerConfig.loadOrThrow(configLoader)
     }
   }
 }

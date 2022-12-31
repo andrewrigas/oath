@@ -6,11 +6,11 @@ import eu.timepit.refined.types.string.NonEmptyString
 
 import scala.concurrent.duration.FiniteDuration
 
-import IssuerConfig.RegisteredConfig
+import JwtIssuerConfig.RegisteredConfig
 
-final case class IssuerConfig(algorithm: Algorithm, registered: RegisteredConfig)
+final case class JwtIssuerConfig(algorithm: Algorithm, registered: RegisteredConfig)
 
-object IssuerConfig {
+object JwtIssuerConfig {
 
   final case class RegisteredConfig(issuerClaim: Option[NonEmptyString] = None,
                                     subjectClaim: Option[NonEmptyString] = None,
@@ -44,17 +44,17 @@ object IssuerConfig {
     )
   }
 
-  def loadOrThrow(config: Config): IssuerConfig = {
+  def loadOrThrow(config: Config): JwtIssuerConfig = {
     val maybeIssuerScoped = config.getMaybeConfig(IssuerConfigLocation)
     val algorithm = AlgorithmLoader.loadAlgorithmOrThrow(config.getConfig(AlgorithmConfigLocation), forIssuing = true)
     val registered = maybeIssuerScoped
       .map(scoped => loadOrThrowRegisteredConfig(scoped.getConfig(RegisteredConfigLocation)))
       .getOrElse(RegisteredConfig())
 
-    IssuerConfig(algorithm, registered)
+    JwtIssuerConfig(algorithm, registered)
   }
 
-  def loadOrThrow(location: String): IssuerConfig = {
+  def loadOrThrow(location: String): JwtIssuerConfig = {
     val configLocation = ConfigFactory.load().getConfig(location)
     loadOrThrow(configLocation)
   }

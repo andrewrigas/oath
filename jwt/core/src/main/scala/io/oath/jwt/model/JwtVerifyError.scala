@@ -15,8 +15,10 @@ object JwtVerifyError {
   final case class DecodingErrors(headerDecodingError: Option[DecodingError],
                                   payloadDecodingError: Option[DecodingError]
   ) extends JwtVerifyError {
-    val headerMessage  = headerDecodingError.map(decodingError => s"\nheader decoding error: ${decodingError.error}")
-    val payloadMessage = payloadDecodingError.map(decodingError => s"\npayload decoding error: ${decodingError.error}")
+    private val headerMessage =
+      headerDecodingError.map(decodingError => s"\nheader decoding error: ${decodingError.error}")
+    private val payloadMessage =
+      payloadDecodingError.map(decodingError => s"\npayload decoding error: ${decodingError.error}")
     val error =
       s"JWT Failed to decode both parts: ${headerMessage.getOrElse("")} ${payloadMessage.getOrElse("")}"
   }
