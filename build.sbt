@@ -75,11 +75,6 @@ lazy val juror = Projects
   .settings(Dependencies.juror)
   .dependsOn(jwtCore % "compile->compile;test->test")
 
-lazy val httpCore = Projects
-  .createModule("http-core", "http/core")
-  .enablePlugins(NoPublishPlugin)
-  .dependsOn(jwtCore)
-
 lazy val csrfCore = Projects
   .createModule("csrf-core", "csrf/core")
   .settings(Dependencies.csrfCore)

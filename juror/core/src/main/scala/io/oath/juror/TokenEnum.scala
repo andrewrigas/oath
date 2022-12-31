@@ -1,10 +1,7 @@
 package io.oath.juror
 
-import com.sun.tools.javac.util.StringUtils
-import io.oath.juror.utils.FormatConversion
 import enumeratum.Enum
-
-import scala.tools.nsc.util.StringUtil
+import io.oath.juror.utils.FormatConversion
 
 trait TokenEnum[A <: TokenEnumEntry] extends Enum[A] {
 

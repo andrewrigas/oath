@@ -1,25 +1,25 @@
 package io.oath.juror
 
-import io.oath.juror.JurorVerifier.Verifier
+import io.oath.juror.JurorVerifier.JwtVerifier
 import io.oath.juror.config.ConfigLoader
-import io.oath.jwt.JwtVerifier
+import io.oath.jwt.{JwtVerifier => JVerifier}
 
 import scala.util.chaining.scalaUtilChainingOps
 
-final class JurorVerifier[A] private (mapping: Map[A, JwtVerifier]) {
+final class JurorVerifier[A] private (mapping: Map[A, JVerifier]) {
 
-  def as[S <: A](tokenType: S): Verifier[S] = mapping(tokenType)
+  def as[S <: A](tokenType: S): JwtVerifier[S] = mapping(tokenType)
 }
 
 object JurorVerifier {
 
-  // Type information useful when issuing tokens to determine the token type.
-  type Verifier[_] = JwtVerifier
+  // Type alias with extra information, useful to determine the token type.
+  type JwtVerifier[_] = JVerifier
 
   def createOrFail[A <: TokenEnumEntry](tokenEnumEntry: TokenEnum[A]): JurorVerifier[A] =
     tokenEnumEntry.mapping.view
       .mapValues(configLocation => ConfigLoader.verifier(configLocation))
-      .mapValues(config => new JwtVerifier(config))
+      .mapValues(config => new JVerifier(config))
       .toMap
       .pipe(mapping => new JurorVerifier(mapping))
 
