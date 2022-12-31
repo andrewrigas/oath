@@ -159,11 +159,12 @@ class JwtIssuerSpec extends AnyWordSpecBase with PropertyBasedTesting with Clock
           payloadResult shouldBe payload
       }
 
-      "issue token should fail with IllegalArgument when algorithm is set to null" in forAll { config: JwtIssuerConfig =>
-        val jwtIssuer = new JwtIssuer(config.copy(algorithm = null))
-        val jwt       = jwtIssuer.issueJwt()
+      "issue token should fail with IllegalArgument when algorithm is set to null" in forAll {
+        config: JwtIssuerConfig =>
+          val jwtIssuer = new JwtIssuer(config.copy(algorithm = null))
+          val jwt       = jwtIssuer.issueJwt()
 
-        jwt shouldBe IssueJwtError.IllegalArgument("The Algorithm cannot be null.").asLeft
+          jwt shouldBe IssueJwtError.IllegalArgument("The Algorithm cannot be null.").asLeft
       }
     }
   }

@@ -18,8 +18,9 @@ class JsoniterConversionSpec extends AnyWordSpecBase {
   val verifierConfig =
     JwtVerifierConfig(Algorithm.none(), ProvidedWithConfig(None, None, Nil), LeewayWindowConfig(None, None, None, None))
   val issuerConfig =
-    JwtIssuerConfig(Algorithm.none(),
-                 RegisteredConfig(None, None, Nil, includeJwtIdClaim = false, includeIssueAtClaim = false, None, None))
+    JwtIssuerConfig(
+      Algorithm.none(),
+      RegisteredConfig(None, None, Nil, includeJwtIdClaim = false, includeIssueAtClaim = false, None, None))
 
   val jwtVerifier = new JwtVerifier(verifierConfig)
   val jwtIssuer   = new JwtIssuer(issuerConfig)

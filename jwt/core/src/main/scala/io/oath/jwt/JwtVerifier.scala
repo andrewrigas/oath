@@ -1,9 +1,9 @@
 package io.oath.jwt
 
 import cats.syntax.all._
+import com.auth0.jwt.JWT
 import com.auth0.jwt.exceptions._
 import com.auth0.jwt.interfaces.DecodedJWT
-import com.auth0.jwt.{JWT, JWTVerifier}
 import io.oath.jwt.config.JwtVerifierConfig
 import io.oath.jwt.model.{JwtClaims, JwtToken, JwtVerifyError, RegisteredClaims}
 import io.oath.jwt.utils._
@@ -12,29 +12,27 @@ import scala.util.control.Exception.allCatch
 
 import scala.util.chaining.scalaUtilChainingOps
 
-final class JwtVerifier(config: JwtVerifierConfig, customJWTVerifier: Option[JWTVerifier] = None) {
+private[oath] final class JwtVerifier(config: JwtVerifierConfig) {
 
   private lazy val jwtVerifier =
-    customJWTVerifier.getOrElse(
-      JWT
-        .require(config.algorithm)
-        .tap(jwtVerification =>
-          config.providedWith.issuerClaim.map(nonEmptyString => jwtVerification.withIssuer(nonEmptyString.value)))
-        .tap(jwtVerification =>
-          config.providedWith.subjectClaim.map(nonEmptyString => jwtVerification.withSubject(nonEmptyString.value)))
-        .tap(jwtVerification =>
-          if (config.providedWith.audienceClaims.nonEmpty)
-            jwtVerification.withAudience(config.providedWith.audienceClaims.map(_.value).toArray: _*))
-        .tap(jwtVerification =>
-          config.leewayWindow.leeway.map(duration => jwtVerification.acceptLeeway(duration.toSeconds)))
-        .tap(jwtVerification =>
-          config.leewayWindow.issuedAt.map(duration => jwtVerification.acceptIssuedAt(duration.toSeconds)))
-        .tap(jwtVerification =>
-          config.leewayWindow.expiresAt.map(duration => jwtVerification.acceptExpiresAt(duration.toSeconds)))
-        .tap(jwtVerification =>
-          config.leewayWindow.notBefore.map(duration => jwtVerification.acceptNotBefore(duration.toSeconds)))
-        .build()
-    )
+    JWT
+      .require(config.algorithm)
+      .tap(jwtVerification =>
+        config.providedWith.issuerClaim.map(nonEmptyString => jwtVerification.withIssuer(nonEmptyString.value)))
+      .tap(jwtVerification =>
+        config.providedWith.subjectClaim.map(nonEmptyString => jwtVerification.withSubject(nonEmptyString.value)))
+      .tap(jwtVerification =>
+        if (config.providedWith.audienceClaims.nonEmpty)
+          jwtVerification.withAudience(config.providedWith.audienceClaims.map(_.value).toArray: _*))
+      .tap(jwtVerification =>
+        config.leewayWindow.leeway.map(duration => jwtVerification.acceptLeeway(duration.toSeconds)))
+      .tap(jwtVerification =>
+        config.leewayWindow.issuedAt.map(duration => jwtVerification.acceptIssuedAt(duration.toSeconds)))
+      .tap(jwtVerification =>
+        config.leewayWindow.expiresAt.map(duration => jwtVerification.acceptExpiresAt(duration.toSeconds)))
+      .tap(jwtVerification =>
+        config.leewayWindow.notBefore.map(duration => jwtVerification.acceptNotBefore(duration.toSeconds)))
+      .build()
 
   private def getRegisteredClaims(decodedJWT: DecodedJWT): RegisteredClaims =
     RegisteredClaims(
