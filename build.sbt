@@ -57,6 +57,7 @@ lazy val root = Projects
 
 lazy val jwtCore = Projects
   .createModule("jwt-core", "jwt/core")
+  .enablePlugins(NoPublishPlugin)
   .settings(Dependencies.jwtCore)
 
 lazy val jwtCirce = Projects
