@@ -16,7 +16,7 @@ object Dependencies {
     val scalaLogging       = "3.9.5"
     val refined            = "0.10.1"
     val circe              = "0.14.3"
-    val jsoniterScala      = "2.19.1"
+    val jsoniterScala      = "2.20.2"
   }
 
   object Testing {
